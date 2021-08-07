@@ -1,7 +1,7 @@
 import angular from 'angular'
 import Vue from 'vue'
 
-function watch (expressions, reactiveData, type) {
+function watch (expressions, reactiveData, type, quirk) {
   return watchFunc => {
     // for `v-props` / `v-data`
     if (angular.isString(expressions)) {
@@ -11,7 +11,12 @@ function watch (expressions, reactiveData, type) {
 
     // for `v-props-something`
     Object.keys(expressions).forEach(name => {
-      watchFunc(expressions[name], Vue.set.bind(Vue, reactiveData._v[type], name))
+      if (name.startsWith(':') || name.startsWith('v-bind:')) {
+        let sname = name.split(':').slice(-1)[0]
+        watchFunc(expressions[name], Vue.set.bind(Vue, reactiveData._v[type], sname))
+      } else {
+        notify(Vue.set.bind(Vue, reactiveData._v[type], name), quirk)
+      }
     })
   }
 }
@@ -64,7 +69,7 @@ export default function watchExpressions (dataExprsMap, reactiveData, options, s
   }
 
   const { depth, quirk } = options
-  const watcher = watch(expressions, reactiveData, type)
+  const watcher = watch(expressions, reactiveData, type, quirk)
 
   switch (depth) {
     case 'value':

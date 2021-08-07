@@ -16,7 +16,11 @@ export default function evaluateValues (expr, scope) {
 
   const evaluatedValues = {}
   Object.keys(expr).forEach(key => {
-    evaluatedValues[key] = scope.$eval(expr[key])
+    if (key.startsWith(':') || key.startsWith('v-bind:')) {
+      evaluatedValues[key] = scope.$eval(expr[key])
+    } else {
+      evaluatedValues[key] = expr[key]
+    }
   })
 
   return evaluatedValues
