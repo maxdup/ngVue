@@ -54,8 +54,8 @@ export function ngVueLinker (componentName, jqElement, elAttributes, scope, $inj
     depth: elAttributes.watchDepth,
     quirk: inQuirkMode
   }
-  watchPropExprs(dataExprsMap, reactiveData, watchOptions, scope, 'props')
-  watchPropExprs(dataExprsMap, reactiveData, watchOptions, scope, 'attrs')
+  watchPropExprs(dataExprsMap, reactiveData, jqElement, watchOptions, scope, 'props')
+  watchPropExprs(dataExprsMap, reactiveData, jqElement, watchOptions, scope, 'attrs')
   watchSpecialAttributes(reactiveData, jqElement, scope)
 
   let vueInstance = new Vue({

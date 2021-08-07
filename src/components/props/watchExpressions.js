@@ -1,7 +1,7 @@
 import angular from 'angular'
 import Vue from 'vue'
 
-function watch (expressions, reactiveData, type, quirk) {
+function watch (expressions, reactiveData, element, type, quirk) {
   return watchFunc => {
     // for `v-props` / `v-data`
     if (angular.isString(expressions)) {
@@ -9,14 +9,25 @@ function watch (expressions, reactiveData, type, quirk) {
       return
     }
 
+    function refreshAll () {
+      // This is a hack, we reassign all values when any value updates
+      // because it seems that all value get forgotten
+      Object.keys(expressions).forEach(name => {
+        Vue.set(reactiveData._v[type], name, expressions[name])
+      })
+    }
+
     // for `v-props-something`
     Object.keys(expressions).forEach(name => {
+      let expression = () => element.attr(name)
       if (name.startsWith(':') || name.startsWith('v-bind:')) {
-        let sname = name.split(':').slice(-1)[0]
-        watchFunc(expressions[name], Vue.set.bind(Vue, reactiveData._v[type], sname))
-      } else {
-        notify(Vue.set.bind(Vue, reactiveData._v[type], name), quirk)
+        expression = expressions[name]
+        name = name.split(':').slice(-1)[0]
       }
+      watchFunc(expression, (value) => {
+        refreshAll()
+        Vue.set(reactiveData._v[type], name, value)
+      })
     })
   }
 }
@@ -30,7 +41,6 @@ function watch (expressions, reactiveData, type, quirk) {
 function notify (setter, inQuirkMode) {
   return function (newVal) {
     let value = newVal
-
     if (inQuirkMode) {
       // `Vue.set` uses a shallow comparision to detect the change in the setters, and so
       // for an object and an array, we have to create a new one to force the reactivity
@@ -56,7 +66,7 @@ function notify (setter, inQuirkMode) {
  * @param scope Object
  * @param type String 'props'|'attrs'
  */
-export default function watchExpressions (dataExprsMap, reactiveData, options, scope, type) {
+export default function watchExpressions (dataExprsMap, reactiveData, element, options, scope, type) {
   let expressions
   if (type === 'props') {
     expressions = dataExprsMap.props ? dataExprsMap.props : dataExprsMap.data
@@ -69,7 +79,7 @@ export default function watchExpressions (dataExprsMap, reactiveData, options, s
   }
 
   const { depth, quirk } = options
-  const watcher = watch(expressions, reactiveData, type, quirk)
+  const watcher = watch(expressions, reactiveData, element, type, quirk)
 
   switch (depth) {
     case 'value':
