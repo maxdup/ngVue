@@ -1,4 +1,4 @@
-import angular, { isArray, isObject } from 'angular'
+import angular from 'angular'
 import './provider'
 
 // contains all the registered filter functions
@@ -25,9 +25,9 @@ function resolveStringFilters ($injector) {
 
 // register a list of ng filters to ngVue
 function registerFilters (filters) {
-  if (isArray(filters)) {
+  if (angular.isArray(filters)) {
     lazyStringFilters = lazyStringFilters.concat(filters)
-  } else if (isObject(filters)) {
+  } else if (angular.isObject(filters)) {
     Object.keys(filters).forEach(name => {
       addFilter(name, filters[name])
     })

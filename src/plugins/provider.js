@@ -1,4 +1,4 @@
-import angular, { extend } from 'angular'
+import angular from 'angular'
 import Vue from 'vue'
 import logger from '../../lib/logger'
 
@@ -93,7 +93,7 @@ function ngVueProvider ($injector) {
     addHooks(pluginHooks, $plugin)
     addHooks(vueHooks, $vue)
 
-    extend(this, {
+    angular.extend(this, {
       [$name]: $config
     })
   }
