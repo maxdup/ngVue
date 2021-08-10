@@ -1,5 +1,38 @@
 # ngVue
 
+## About this fork
+```
+ngVue/ngVue does a good job of glueing together angularjs and vue.js. However, how it does so is pretty fuzzy
+and inconsistent. The way ngVue components are consumed doesn't matches the api of angularjs or vue.js. It's 
+a weird mix of both, and it doesn't always behave the way you think it will.
+
+for example, in vue, an attribute may be evaluated if it has the right prefix:
+
+attributeName="attributeValue" // will not be evaluated and attributeName will be 'attributeValue'
+v-bind:attributeName="attributeValue" // will be evaluated as the value of 'attributeValue'
+:attributeName="attributeValue" // will be evaluated as the value of 'attributeValue'
+
+Presented with these cases, ngVue evaluates all of them against the angular scope. This fork aims to make 
+ngVue components consumable in a way that is consistent with Vue's API. 
+
+an other point of contention is how events are evaluated:
+
+this.$emit('someEvent', emitValue)
+-hooks into-
+v-on:some-event="callback_function($event, variable)"
+
+This is a bit of a mess but this doesn't work in ngVue/ngVue because the angular scope cannot 
+evaluate $event properly:
+-"$event" corresponds to "emitValue" which belongs to the component.
+-"callback_function" and "variable" both belong to the angular scope.
+This fork addresses this by evaluating the expressions against the appropriate sources.
+
+Note: I'm just at the begining of my angular->vue transition journey. I'll keep updating this repo as I go. 
+It's been important for me to have my ngVue components be consumed as vue components because otherwise, 
+I found myself forced into coding vue components in a way that wasn't vue-like which made learning vue 
+more confusing.
+```
+
 [![Build status](https://api.travis-ci.org/ngVue/ngVue.svg)](https://travis-ci.org/ngVue/ngVue) [![JavaScript Style Guide](https://img.shields.io/badge/code%20style-standard-brightgreen.svg)](http://standardjs.com/) [![npm version](https://badge.fury.io/js/ngVue.svg)](https://badge.fury.io/js/ngVue) [![Dependency Status](https://david-dm.org/ngVue/ngVue.svg)](https://david-dm.org/ngVue/ngVue/) [![Monthly npm downloads](https://img.shields.io/npm/dm/ngVue.svg)](https://img.shields.io/npm/dm/ngVue.svg) [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 [**VueJS**](https://vuejs.org/) is a library to build web interfaces with composable view components and reactive data binding. **ngVue**, inspired by [ngReact](https://github.com/ngReact/ngReact), is an Angular module that allows you to develop/use Vue components in AngularJS applications. ngVue can be used in the existing Angular applications and helps migrate the view parts of the application from Angular 1.x to Vue 2.
