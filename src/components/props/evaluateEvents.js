@@ -15,14 +15,9 @@ export default function evaluateEvents (dataExprsMap, scope) {
 
   const evaluatedEvents = {}
   Object.keys(events).forEach(eventName => {
-    let re = /[^,()]+/g
-    let match = re.exec(events[eventName])
-    let ngfn = scope.$eval(match[0])
-    let args = []
-    while (match) {
-      args.push(match[0])
-      match = re.exec(events[eventName])
-    }
+    let args = events[eventName].match(/[^,()]+/g)
+    let ngfn = scope.$eval(args.shift())
+    args.length === 0 && args.push('$event')
     evaluatedEvents[eventName] = function () {
       var _arguments = arguments
 
@@ -35,11 +30,7 @@ export default function evaluateEvents (dataExprsMap, scope) {
             evalArgs.push(scope.$eval(args[i]))
           }
         }
-        if (evalArgs.length > 0) {
-          return ngfn.apply(null, evalArgs)
-        } else {
-          return ngfn.apply(null, _arguments)
-        }
+        return ngfn.apply(null, evalArgs)
       })
     }
   })

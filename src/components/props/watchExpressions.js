@@ -8,23 +8,19 @@ function watch (expressions, reactiveData, element, type, quirk) {
       watchFunc(expressions, Vue.set.bind(Vue, reactiveData._v, type))
       return
     }
-
+    let clean = name => name.split(':').slice(-1)[0]
     function refreshAll () {
       // This is a hack, we reassign all values when any value updates
       // because it seems that all value get forgotten
       Object.keys(expressions).forEach(name => {
-        Vue.set(reactiveData._v[type], name, expressions[name])
+        let value = clean(name) === name ? expressions[name] : scope.$eval(expressions[name])
+        Vue.set(reactiveData._v[type], clean(name), value)
       })
     }
-
     // for `v-props-something`
     Object.keys(expressions).forEach(name => {
-      let expression = () => element.attr(name)
-      if (name.startsWith(':') || name.startsWith('v-bind:')) {
-        expression = expressions[name]
-        name = name.split(':').slice(-1)[0]
-      }
-      watchFunc(expression, (value) => {
+      let expression = clean(name) === name ? () => element.attr(name) : expressions[name]
+      watchFunc(expression, value => {
         refreshAll()
         Vue.set(reactiveData._v[type], name, value)
       })
