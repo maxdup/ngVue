@@ -1,7 +1,7 @@
 import angular from 'angular'
 import Vue from 'vue'
 
-function watch (expressions, reactiveData, element, type, quirk) {
+function watch (expressions, reactiveData, scope, element, type, quirk) {
   return watchFunc => {
     // for `v-props` / `v-data`
     if (angular.isString(expressions)) {
@@ -75,7 +75,7 @@ export default function watchExpressions (dataExprsMap, reactiveData, element, o
   }
 
   const { depth, quirk } = options
-  const watcher = watch(expressions, reactiveData, element, type, quirk)
+  const watcher = watch(expressions, reactiveData, scope, element, type, quirk)
 
   switch (depth) {
     case 'value':
