@@ -57,7 +57,7 @@ export function extractExpressions (exprType, attributes) {
       let attrValue
       // Handle attributes with no value, e.g. <button disabled></button>
       if (attributes[attrExprName] === '') {
-        attrValue = `'${attrExprName}'`
+        attrValue = true
       } else {
         attrValue = attributes[attrExprName]
       }
