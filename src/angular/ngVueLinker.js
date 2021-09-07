@@ -92,12 +92,6 @@ export function ngVueLinker (componentName, jqElement, elAttributes, scope, $inj
     }
   })
 
-  props.mounted = () => {
-    if (angular.isFunction(mounted)) {
-      mounted.apply(this, arguments)
-    }
-  }
-
   const watchOptions = {
     depth: elAttributes.watchDepth,
     quirk: inQuirkMode
@@ -110,6 +104,12 @@ export function ngVueLinker (componentName, jqElement, elAttributes, scope, $inj
     name: 'NgVue',
     el: jqElement[0],
     data: reactiveData,
+    mounted () {
+      if (angular.isFunction(mounted)) {
+        mounted.apply(this, arguments)
+      }
+      scope.$refs = this.$refs
+    },
     render (h) {
       let scopedslots = {}
       Object.keys(namedTemplates).forEach(key => {
@@ -120,7 +120,13 @@ export function ngVueLinker (componentName, jqElement, elAttributes, scope, $inj
       return (
         <Component
           {...{ directives }}
-          {...{ props: reactiveData._v.props, on, scopedSlots: scopedslots, attrs: reactiveData._v.attrs }}
+          {...{
+            props: reactiveData._v.props,
+            on,
+            ref: dataExprsMap.ref,
+            scopedSlots: scopedslots,
+            attrs: reactiveData._v.attrs
+          }}
           {...reactiveData._v.special}
         >
           {<span ref="__slot__" />}

@@ -15,7 +15,8 @@ export function extractExpressions (exprType, attributes) {
   const exprKeys = {
     props: 'vProps',
     data: 'vData',
-    on: 'vOn'
+    on: 'vOn',
+    ref: 'ref'
   }
   const objectExprKey = exprKeys[exprType]
   const objectPropExprRegExp = new RegExp(objectExprKey, 'i')
@@ -77,6 +78,7 @@ export default function getExpressions (attributes) {
     data: extractExpressions('data', attributes),
     props: extractExpressions('props', attributes),
     events: extractExpressions('on', attributes),
+    ref: extractExpressions('ref', attributes),
     htmlAttributes: extractExpressions('htmlAttributes', attributes)
   }
 }
