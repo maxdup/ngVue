@@ -108,7 +108,11 @@ export function ngVueLinker (componentName, jqElement, elAttributes, scope, $inj
       if (angular.isFunction(mounted)) {
         mounted.apply(this, arguments)
       }
-      scope.$refs = this.$refs
+      if (!scope.$refs) {
+        scope.$refs = this.$refs
+      } else {
+        Object.assign(scope.$refs, this.$refs)
+      }
     },
     render (h) {
       let scopedslots = {}
